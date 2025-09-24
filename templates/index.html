@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invernadero</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/iconoInv.png') }}">
+</head>
+<body>
+    <header class="header" id="inicio">
+        <div class="contenedor head">
+            <a id="Ayuda" class="presionar help" href="{{ url_for('ayuda') }}">Ayuda</a>
+            <h1 class="titulo">{{ titulo }}</h1>
+            <p class="copy">{{ descripcion }}</p>
+        </div>
+    </header>
+    
+    <main>
+        <section class="contenedor" id="items">
+            <h2 class="subtitulo" id="subirArchivo">Cargar Archivo .xml</h2>
+            <div class="container">
+                <div class="right-panel">
+                    <h2 class="n-service">Leer txt dinámicamente</h2>
+                    <div class="upload-box">
+                        <input type="file" id="fileXML" accept=".xml">
+                    </div>
+                </div>
+            </div>
+            <br>
+            <section class="opciones">
+                <div class="cont-item">
+                    <button id="reporte" class="boton">Crear Reportes</button>
+                </div>
+                <div class="cont-item">
+                    <button id="salidas" class="boton">Generar Salidas</button>
+                </div>
+            </section>
+        </section>
+    </main>
+</body>
+</html>
+
+

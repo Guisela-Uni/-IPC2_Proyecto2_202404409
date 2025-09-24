@@ -1,0 +1,229 @@
+index.html
+*{
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+html {
+    scroll-behavior: smooth;
+}
+body{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.contenedor{
+    width: 90%;
+    max-width: 1200px;
+    overflow: hidden;
+    margin: auto;
+    padding: 60px 0;
+}
+header{
+    height: 50vh;
+    background-image: url(img/invernadero.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+.head{
+    padding: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.head h1{
+    color:rgb(254, 254, 254);
+    text-align: center;
+}
+.head p{
+    color:rgb(103, 225, 103);
+    text-align: center;
+}
+.help{
+    text-align: left;
+    color:rgb(254, 254, 254);
+    margin-top: 30px;
+}
+.titulo{
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+.copy{
+    font-weight: 300;
+    font-size: 25px;
+}
+.subtitulo{
+    text-align: center;
+    font-weight: 300;
+    color: green;
+    margin-bottom: 40px;
+    font-size: 40px;
+}
+
+.contededor{
+    display: flex; /*uno al lado del otro*/
+    justify-content: center;
+    
+}
+.opciones{
+    display: flex;
+    margin-top: 50px;
+}
+.cont-item{
+    text-align: center;
+    width: 30%;
+    margin-bottom: 20px;
+    
+}
+.cont-item h3:hover{
+    background-color: rgb(68, 234, 143);
+}
+.cont-item img{
+    width: 70%;
+    display: block;
+    margin: 0 auto;
+}
+.n-item{
+    display: inline-block;
+    margin-top: 20px;
+    width: 100%;
+    font-weight: 700;
+}
+h3{
+    font-size: 26px;
+    font-family: 'Times New Roman', Times, serif;
+    
+}
+.leerArchivo{
+    background-color: #43e97b
+}
+textarea {
+    width: 90%;
+    height: 200px;
+    margin: 20px auto;
+    display: block;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    resize: vertical; /* Permite redimensionar verticalmente */
+}
+.boton {
+    background-color: #25d35f;
+    color: rgb(255, 255, 255);
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 26px;
+    font-family: 'Times New Roman', Times, serif;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+}
+.boton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(10, 106, 85, 0.315);
+
+}
+.container {
+    display: flex;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    width: 50%;
+    max-width: 1200px;
+    overflow: hidden;
+    margin: auto;
+    padding: 60px 0;
+    color: black;
+    margin-bottom: 30px;   
+    margin-top: 40px;
+}
+.right-panel {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.upload-box {
+    border: 2px dashed #6a0dad;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    font-size: 20px;
+    color: #6a0dad;
+    margin-bottom: 15px;
+}
+.upload-box input[type="file"], .upload-box input[type="text"], .upload-box button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+/* Para JS de Leer Archivo txt*/
+.seccion {
+    margin-bottom: 30px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10px;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+.container2 {
+    max-width: 600px;
+    margin: 60px auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+.info {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #34495e;
+}
+.info span {
+    font-weight: bold;
+    color: #1abc9c;
+}
+.usage {
+    margin-top: 30px;
+    background-color: #ecf0f1;
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #2c3e50;
+}
+.footer {
+text-align: center;
+margin-top: 40px;
+font-size: 14px;
+color: #95a5a6;
+}
+.fondoAyuda{
+    background-image: url(img/invernadero.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    height: 100vh;
+}
