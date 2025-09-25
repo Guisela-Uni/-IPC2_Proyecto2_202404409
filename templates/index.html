@@ -24,10 +24,16 @@
                     <h2 class="n-service">Leer txt dinámicamente</h2>
                     <div class="upload-box">
                         <input type="file" id="fileXML" accept=".xml">
+                        <button onclick="subirArchivo()" class="boton">Procesar XML</button>
                     </div>
                 </div>
             </div>
             <br>
+
+            <!-- div para que desplieguen los invernaderos a elegir -->
+            <div id="listaInvernaderos"></div>
+            <div id="mensajeSeleccion"></div>
+
             <section class="opciones">
                 <div class="cont-item">
                     <button id="reporte" class="boton">Crear Reportes</button>
@@ -38,6 +44,59 @@
             </section>
         </section>
     </main>
+
+
+
+    <script>
+    function subirArchivo() {
+        const archivo = document.getElementById('fileXML').files[0];
+        console.log("Archivo seleccionado:", archivo); // 👈 Verifica que no sea undefined
+
+        if (!archivo) {
+            alert("Por favor selecciona un archivo XML.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('archivo', archivo);
+
+        fetch('/procesar_xml', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Respuesta del servidor:", data); // 👈 Verifica que no haya error
+            if (data.invernaderos) {
+                const contenedor = document.getElementById('listaInvernaderos');
+                contenedor.innerHTML = '<h3>Invernaderos cargados:</h3>';
+                data.invernaderos.forEach(nombre => {
+                    const btn = document.createElement('button');
+                    btn.textContent = nombre;
+                    btn.onclick = () => seleccionarInvernadero(nombre);
+                    contenedor.appendChild(btn);
+                });
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error("❌ Error en fetch:", error);
+        });
+    }
+
+    function seleccionarInvernadero(nombre) {
+        fetch('/seleccionar_invernadero', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({nombre})
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('mensajeSeleccion').textContent = data.mensaje;
+        });
+    }
+    </script>
 </body>
 </html>
 

@@ -1,71 +1,84 @@
-from ListaSimple import ListaSimple
-from Invernadero_Clases import Dron, AsignacionDrones as AsignacionDron, plantas as Planta, planesRiego as PlanRiego, Invernadero
+# -- MODIFICADO --
 from xml.dom.minidom import parse
+from ListaSimple import ListaSimple
+from Invernadero_Clases import Dron, AsignacionDrones as AsignacionDron, plantas as Planta, planRiego as PlanRiego, Invernadero
 
 class carga:
     def __init__(self):
-        self.drones = ListaSimple()
-        self.invernaderos = ListaSimple()
+        self.drones = ListaSimple() # Lista de drones 
+        self.invernaderos = ListaSimple()# Lista de invernaderos
 
     def cargar_archivo(self, ruta):
         try:
             dom = parse(ruta)
-            print("📂 Cargando archivo XML...")
 
-            # Drones
-            drones_xml = dom.getElementsByTagName('dron') #se obtienen todos los nodos <dron> y getElementsByTagName recorre cada nodo
-            for dron_xml in drones_xml:
-                id_dron = int(dron_xml.getAttribute('id'))
-                nombre_dron = dron_xml.getAttribute('nombre')
-                dron = Dron(id_dron, nombre_dron) #se encapsula en un objeto Dron
-                self.drones.insertar(dron)
-                print(f"Dron registrado: {id_dron} - {nombre_dron}")
+            # Drones, carga la lista de drones
+            ListaDrones = dom.getElementsByTagName('listaDrones')
+            if ListaDrones:
+                lista_drones = ListaDrones[0]
+                for dron_xml in lista_drones.getElementsByTagName('dron'):
+                    #try except para evitar errores si el id no es un entero
+                    try:
+                        id_dron = int(dron_xml.getAttribute('id'))
+                    except Exception:
+                        # salta si el id no es válido
+                        continue
+                    nombre_dron = dron_xml.getAttribute('nombre')
+                    self.drones.insertar(Dron(id_dron, nombre_dron))
 
             # Invernaderos
-            invernaderos_xml = dom.getElementsByTagName('invernadero')
-            for inv_xml in invernaderos_xml:
+            ListaInvernaderos = dom.getElementsByTagName('listaInvernaderos')
+            if not ListaInvernaderos:
+                print("Advertencia: no se encontró el nodo <listaInvernaderos>")
+                return
+            lista_invernaderos = ListaInvernaderos[0]
+            for inv_xml in lista_invernaderos.getElementsByTagName('invernadero'):
                 nombre = inv_xml.getAttribute('nombre')
                 hileras = int(inv_xml.getElementsByTagName('numeroHileras')[0].firstChild.data.strip())
                 plantasXhilera = int(inv_xml.getElementsByTagName('plantasXhilera')[0].firstChild.data.strip())
                 invernadero = Invernadero(nombre, hileras, plantasXhilera)
-                print(f" Invernadero cargado: {nombre}")
+                print("Invernaderos encontrados:", len(dom.getElementsByTagName('invernadero')))
 
                 # Plantas
-                plantas_xml = inv_xml.getElementsByTagName('planta')
-                for planta_xml in plantas_xml:
-                    hilera = int(planta_xml.getAttribute('hilera'))
-                    posicion = int(planta_xml.getAttribute('posicion'))
-                    litros = int(planta_xml.getAttribute('litrosAgua'))
-                    gramos = int(planta_xml.getAttribute('gramosFertilizante'))
-                    tipo = planta_xml.firstChild.data.strip()
-                    planta = Planta(hilera, posicion, litros, gramos, tipo)
-                    invernadero.plantas.insertar(planta)
+                ListaPlantas = inv_xml.getElementsByTagName('listaPlantas')
+                if ListaPlantas:
+                    lista_plantas = ListaPlantas[0]
+                    for planta_xml in lista_plantas.getElementsByTagName('planta'):
+                        #try except para evitar errores, si faltan atributos o no son enteros, saltar esta planta
+                        try:
+                            hilera = int(planta_xml.getAttribute('hilera'))
+                            posicion = int(planta_xml.getAttribute('posicion'))
+                            litros = int(planta_xml.getAttribute('litrosAgua'))
+                            gramos = int(planta_xml.getAttribute('gramosFertilizante'))
+                        except Exception:
+                            continue
+                        tipo = planta_xml.firstChild.data.strip() if planta_xml.firstChild else ""
+                        invernadero.plantas.insertar(Planta(hilera, posicion, litros, gramos, tipo))
 
-                print(f" 🌱 Plantas registradas: {plantas_xml.length}")
-
-                # Asignaciones de drones
-                asignaciones_xml = inv_xml.getElementsByTagName('dron')
-                for asignacion_xml in asignaciones_xml:
-                    id_dron = int(asignacion_xml.getAttribute('id'))
-                    hilera = int(asignacion_xml.getAttribute('hilera'))
-                    asignacion = AsignacionDron(id_dron, hilera)
-                    invernadero.asignaciones.insertar(asignacion)
-
-                print(f" Asignaciones de drones: {asignaciones_xml.length}")
+                # Asignacione de drones
+                AsignacionesDrones = inv_xml.getElementsByTagName('asignacionDrones')
+                if AsignacionesDrones:
+                    asignaciones = AsignacionesDrones[0]
+                    for asignacion_xml in asignaciones.getElementsByTagName('dron'):
+                        try:
+                            id_dron = int(asignacion_xml.getAttribute('id'))
+                            hilera = int(asignacion_xml.getAttribute('hilera'))
+                        except Exception:
+                            continue
+                        invernadero.asignaciones.insertar(AsignacionDron(id_dron, hilera))
 
                 # Planes de riego
-                planes_xml = inv_xml.getElementsByTagName('plan')
-                for plan_xml in planes_xml:
-                    nombre_plan = plan_xml.getAttribute('nombre')
-                    acciones = plan_xml.firstChild.data.strip()
-                    plan = PlanRiego(nombre_plan, acciones)
-                    invernadero.planes.insertar(plan)
-
-                print(f" 💧 Planes de riego cargados: {planes_xml.length}")
+                planes_nodes = inv_xml.getElementsByTagName('planesRiego')
+                if planes_nodes:
+                    planes = planes_nodes[0]
+                    for plan_xml in planes.getElementsByTagName('plan'):
+                        nombre_plan = plan_xml.getAttribute('nombre')
+                        acciones = plan_xml.firstChild.data.strip() if plan_xml.firstChild else ""
+                        invernadero.planes.insertar(PlanRiego(nombre_plan, acciones))
 
                 self.invernaderos.insertar(invernadero)
+                print("Invernadero insertado:", invernadero.nombre)
 
-            print("✅ Archivo cargado exitosamente ¡Super!")
-
+        #error general al cargar el archivo
         except Exception as e:
-            print(f"❌ Error al cargar archivo: {e}")
+            print("Error al cargar archivo:", e)

@@ -20,8 +20,9 @@ class plantas:
 
 
 class planRiego:
-    def __init__(self, secuencia, nombre):
-        self.nombre= nombre
+    # Ajustado para aceptar (nombre, secuencia) tal como lo crea lectorXML
+    def __init__(self, nombre, secuencia):
+        self.nombre = nombre
         self.secuencia = secuencia
 
 class Invernadero: #objeto Invernadero, contiene listas de plantas, asignaciones y planes
@@ -34,10 +35,11 @@ class Invernadero: #objeto Invernadero, contiene listas de plantas, asignaciones
         self.planes = ListaSimple()  # Lista de planes de riego
 
     def agregar_planta(self, planta):
-        self.plantas.append(planta)
+        # ListaSimple usa `insertar`
+        self.plantas.insertar(planta)
 
     def agregar_asignacion(self, asignacion):
-        self.asignaciones.append(asignacion)
+        self.asignaciones.insertar(asignacion)
 
     def agregar_plan(self, plan):
-        self.planes.append(plan)
+        self.planes.insertar(plan)

@@ -1,0 +1,17 @@
+<configuracion>
+    <listaInvernaderos>
+        <invernadero nombre="Prueba">
+            <numeroHileras>1</numeroHileras>
+            <plantasXhilera>1</plantasXhilera>
+            <listaPlantas>
+                <planta hilera="1" posicion="1" litrosAgua="1" gramosFertilizante="100"> ciprés </planta>
+            </listaPlantas>
+            <asignacionDrones>
+                <dron id="1" hilera="1"/>
+            </asignacionDrones>
+            <planesRiego>
+                <plan nombre="Semana 1"> H1-P1 </plan>
+            </planesRiego>
+        </invernadero>
+    </listaInvernaderos>
+</configuracion>

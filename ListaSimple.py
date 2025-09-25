@@ -39,3 +39,10 @@ class ListaSimple:
             actual = actual.siguiente
             indice += 1
         return -1
+    
+    def recorrer(self):
+        actual = self.primero
+        while actual:
+            yield actual.info
+            actual = actual.siguiente
+
