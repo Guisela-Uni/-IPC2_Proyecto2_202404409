@@ -1,0 +1,22 @@
+digraph EstadosDrones {
+  label="Estados de Drones por Segundo";
+  labelloc="t";
+  fontsize=20;
+  node [shape=box, style=filled, color=lightcyan];
+  rankdir=LR;
+  "t=1" [label="t=1\nDR04: Adelante (H4P1)\nDR03: Adelante (H3P1)\nDR02: Adelante (H2P1)\nDR01: Adelante (H1P1)"];
+  "t=2" [label="t=2\nDR04: Espera\nDR03: Adelante (H3P2)\nDR02: Adelante (H2P2)\nDR01: Adelante (H1P2)"];
+  "t=3" [label="t=3\nDR04: Espera\nDR03: Espera\nDR02: Adelante (H2P3)\nDR01: Adelante (H1P3)"];
+  "t=4" [label="t=4\nDR04: Espera\nDR03: Espera\nDR02: Espera\nDR01: Regar"];
+  "t=5" [label="t=5\nDR04: FIN\nDR03: Espera\nDR02: Espera\nDR01: Espera"];
+  "t=6" [label="t=6\nDR03: FIN\nDR02: Espera\nDR01: Espera"];
+  "t=7" [label="t=7\nDR02: FIN\nDR01: Espera"];
+  "t=8" [label="t=8\nDR01: FIN"];
+  "t=1" -> "t=2";
+  "t=2" -> "t=3";
+  "t=3" -> "t=4";
+  "t=4" -> "t=5";
+  "t=5" -> "t=6";
+  "t=6" -> "t=7";
+  "t=7" -> "t=8";
+}

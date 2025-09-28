@@ -69,3 +69,7 @@ class Cola:
             
         return primerotemp.obtenerInfo() #devuelve la informacion del nodo que estaba en el frente de la cola
     
+    def ver_frente(self):
+        if self.estaVacia():
+            return None
+        return self.primero.obtenerInfo()

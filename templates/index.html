@@ -66,6 +66,18 @@
         </form>
         {% endif %}
 
+        <!-- 
+        <form method="POST" action="/reportes">
+            
+            <button type="submit">Generar reportes</button>
+        </form>
+
+        
+        <form method="POST" action="/descargar_grafico">
+            
+            <button type="submit">Descargar Gráfico de Estados</button>
+        </form-->
+
         {% if tiempo_total %}
         <div id="tiempo">
             <h2>Tiempo óptimo de riego: {{ tiempo_total }} segundos</h2>
@@ -78,23 +90,49 @@
             {{ tabla|safe }}
         </div>
 
-        <form method="POST" action="/generar_reportes">
+        <form method="POST" action="/generar_simulacion">
             <input type="hidden" name="archivo_nombre" value="{{ uploaded_filename }}">
             <input type="hidden" name="invernadero" value="{{ seleccion_actual.invernadero }}">
             <input type="hidden" name="riego" value="{{ seleccion_actual.riego }}">
             <input type="hidden" name="fertilizante" value="{{ seleccion_actual.fertilizante }}">
             <input type="hidden" name="tiempo_dron" value="{{ seleccion_actual.tiempo_dron }}">
-            <button type="submit">Generar Reportes</button>
+            <button type="submit">Visualizar recorrido</button>
         </form>
         {% endif %}
+
+        {% if uploaded_filename %}
+        <form method="POST" action="/generar_reporte_html">
+            <!-- Pasamos el archivo cargado al backend -->
+            <input type="hidden" name="archivo_nombre" value="{{ uploaded_filename }}">
+            <button type="submit" class="boton">Descargar reporte html</button>
+        </form>
+        {% endif %}
+
 
         {% if tabla_eventos %}
         <div id="recorrido">
             <h2>Simulación paso a paso</h2>
+            <!--button type="submit">Descargar Gráfico de Estados</button-->
             {{ tabla_eventos|safe }}
+            <!-- Formulario para descargar gráfico -->
+            <br>
+            <br>
+            <form method="POST" action="/descargar_grafico" style="display:inline;">
+                <input type="hidden" name="archivo_nombre" value="{{ uploaded_filename }}">
+                <input type="hidden" name="invernadero" value="{{ seleccion_actual.invernadero }}">
+                <input type="hidden" name="riego" value="{{ seleccion_actual.riego }}">
+                <input type="hidden" name="fertilizante" value="{{ seleccion_actual.fertilizante }}">
+                <input type="hidden" name="tiempo_dron" value="{{ seleccion_actual.tiempo_dron }}">
+                <button type="submit">Descargar Gráfico de Estados</button>
+            </form>
         </div>
         {% endif %}
     </main>
+
+    {% if imagen_estado %}
+    <h2>Estados de Drones</h2>
+    <img src="{{ url_for('static', filename='uploads/' + imagen_estado) }}" alt="Estados de Drones">
+    {% endif %}
 
     {% if uploaded_filename %}
     <script>
