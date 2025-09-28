@@ -1,4 +1,3 @@
-# -- MODIFICADO --
 from xml.dom.minidom import parse
 from ListaSimple import ListaSimple
 from Invernadero_Clases import Dron, AsignacionDrones as AsignacionDron, plantas as Planta, planRiego as PlanRiego, Invernadero
@@ -82,3 +81,19 @@ class carga:
         #error general al cargar el archivo
         except Exception as e:
             print("Error al cargar archivo:", e)
+    
+    def buscar_invernadero(self, nombre):
+        actual = self.invernaderos.primero
+        while actual:
+            if actual.info.nombre == nombre:
+                return actual.info
+            actual = actual.siguiente
+        return None
+    
+    def buscar_plan(self, invernadero, nombre_plan):
+        actual = invernadero.planes.primero
+        while actual:
+            if actual.info.nombre == nombre_plan:
+                return actual.info
+            actual = actual.siguiente
+        return None

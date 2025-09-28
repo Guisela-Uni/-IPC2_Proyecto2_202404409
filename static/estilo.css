@@ -227,3 +227,62 @@ color: #95a5a6;
     background-position: center;
     height: 100vh;
 }
+/* FORMULARIO */
+form {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px 25px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Selects */
+form select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+    transition: border 0.2s;
+}
+form select:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+form input[type="checkbox"] {
+    margin-right: 8px;
+}
+form label {
+    font-size: 14px;
+    color: #333;
+}
+/* Input del numero */
+form input[type="number"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    width: 100%;
+    transition: border 0.2s;
+}
+form input[type="number"]:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+form button[type="submit"] {
+    padding: 12px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+form button[type="submit"]:hover {
+    background: #45a049;
+}

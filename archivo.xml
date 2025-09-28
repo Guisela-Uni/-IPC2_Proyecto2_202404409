@@ -36,7 +36,7 @@
                 <!-- más planes si aplica -->
             </planesRiego>
         </invernadero>
-        <invernadero nombre="Prueba">
+        <invernadero nombre="Invernadero Quetzaltenango">
             <numeroHileras>1</numeroHileras>
             <plantasXhilera>1</plantasXhilera>
             <listaPlantas>

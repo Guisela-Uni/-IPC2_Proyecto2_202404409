@@ -1,4 +1,5 @@
 from ListaSimple import ListaSimple
+from estructuras.Cola import Cola
 
 class Dron: #objetos Dron, para usar en la lista de drones
     def __init__(self, id, nombre):
@@ -35,7 +36,6 @@ class Invernadero: #objeto Invernadero, contiene listas de plantas, asignaciones
         self.planes = ListaSimple()  # Lista de planes de riego
 
     def agregar_planta(self, planta):
-        # ListaSimple usa `insertar`
         self.plantas.insertar(planta)
 
     def agregar_asignacion(self, asignacion):
@@ -43,3 +43,19 @@ class Invernadero: #objeto Invernadero, contiene listas de plantas, asignaciones
 
     def agregar_plan(self, plan):
         self.planes.insertar(plan)
+
+class EstadoDron:
+    def __init__(self, id_dron, posicion_actual):
+        self.id_dron = id_dron
+        self.posicion_actual = posicion_actual
+
+class AccionesDron:
+    def __init__(self, id_dron):
+        self.id_dron = id_dron
+        self.acciones = Cola()
+
+class Evento:
+    def __init__(self, tiempo, id_dron, accion):
+        self.tiempo = tiempo
+        self.id_dron = id_dron
+        self.accion = accion

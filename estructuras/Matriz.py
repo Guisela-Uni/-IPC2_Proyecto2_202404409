@@ -38,3 +38,5 @@ class Matriz:
                 actual_columna = actual_columna.siguiente
             print(fila_str.strip())
             actual_fila = actual_fila.siguiente
+
+    
