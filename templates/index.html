@@ -66,17 +66,6 @@
         </form>
         {% endif %}
 
-        <!-- 
-        <form method="POST" action="/reportes">
-            
-            <button type="submit">Generar reportes</button>
-        </form>
-
-        
-        <form method="POST" action="/descargar_grafico">
-            
-            <button type="submit">Descargar Gráfico de Estados</button>
-        </form-->
 
         {% if tiempo_total %}
         <div id="tiempo">
@@ -106,6 +95,12 @@
             <input type="hidden" name="archivo_nombre" value="{{ uploaded_filename }}">
             <button type="submit" class="boton">Descargar reporte html</button>
         </form>
+
+        <form method="POST" action="/generar_salida_xml">
+            <input type="hidden" name="archivo_nombre" value="{{ uploaded_filename }}">
+            <button type="submit">Descargar Salida XML</button>
+        </form>
+
         {% endif %}
 
 

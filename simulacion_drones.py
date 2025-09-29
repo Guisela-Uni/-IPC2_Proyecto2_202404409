@@ -47,14 +47,14 @@ def buscar_estado_dron(lista_estados, id_dron):
         actual = actual.siguiente
     return None
 
-# Simulación de el recorrido de los drones
+# Simulación del recorrido de los drones
 def simular_recorrido(invernadero, plan):
     if not plan or not hasattr(plan, 'secuencia') or not isinstance(plan.secuencia, str):
         eventos = Cola()
         eventos.Push(Evento(0, "Sistema", "Plan inválido"))
         return eventos
 
-    # se parsea el plan en una Cola de acciones (hilera, posicion)
+    # Parsear el plan en una Cola de acciones (hilera, posicion)
     cola_acciones_plan = Cola()
     acciones = plan.secuencia.split(',')
     for paso in acciones:
@@ -79,7 +79,7 @@ def simular_recorrido(invernadero, plan):
         eventos.Push(Evento(0, "Sistema", "Plan vacío"))
         return eventos
 
-    #  Crea el  mapeo hilera, dron
+    # Crear el mapeo hilera -> dron
     mapeo_hilera_dron = ListaSimple()
     actual_asignacion = invernadero.asignaciones.primero
     while actual_asignacion:
@@ -87,20 +87,20 @@ def simular_recorrido(invernadero, plan):
         mapeo_hilera_dron.insertar(MapeoHileraDron(asignacion.hilera, asignacion.id_dron))
         actual_asignacion = actual_asignacion.siguiente
 
-    # inicializar estado de drones y sus rutas
+    # Inicializar estado de drones
     estados_drones = ListaSimple()
-    # Primero, crear entrada para cada dron que aparece en el plan
     temp_acciones = Cola()
+    
+    # Primero, recolectar todos los drones involucrados y crear sus estados
     while not cola_acciones_plan.estaVacia():
         accion = cola_acciones_plan.Pop()
         temp_acciones.Push(accion)
         hilera = accion.primero.info
         id_dron = buscar_dron_por_hilera(mapeo_hilera_dron, hilera)
         if id_dron is not None:
-            # Verifica si ya existe el estado
             estado_existente = buscar_estado_dron(estados_drones, id_dron)
             if estado_existente is None:
-                # Encontrar hilera del dron
+                # Encontrar la hilera asignada al dron
                 hilera_dron = None
                 actual_mapeo = mapeo_hilera_dron.primero
                 while actual_mapeo:
@@ -111,15 +111,17 @@ def simular_recorrido(invernadero, plan):
                     actual_mapeo = actual_mapeo.siguiente
                 estados_drones.insertar(EstadoDronSim(id_dron, hilera_dron))
 
-    # Restaurar cola_acciones_plan
+    # Restaurar cola_acciones_plan y construir lista de acciones
+    acciones_plan = ListaSimple()
     while not temp_acciones.estaVacia():
-        cola_acciones_plan.Push(temp_acciones.Pop())
+        accion = temp_acciones.Pop()
+        cola_acciones_plan.Push(accion)
+        acciones_plan.insertar(accion)
 
-    # asignar las posiciones a las colas de cada dron
-    temp_acciones2 = Cola()
-    while not cola_acciones_plan.estaVacia():
-        accion = cola_acciones_plan.Pop()
-        temp_acciones2.Push(accion)
+    # Asignar posiciones a las colas de cada dron
+    actual_accion = acciones_plan.primero
+    while actual_accion:
+        accion = actual_accion.info
         hilera = accion.primero.info
         posicion = accion.primero.siguiente.info
         id_dron = buscar_dron_por_hilera(mapeo_hilera_dron, hilera)
@@ -127,79 +129,73 @@ def simular_recorrido(invernadero, plan):
             estado = buscar_estado_dron(estados_drones, id_dron)
             if estado:
                 estado.cola_posiciones.Push(posicion)
-
-    acciones_plan = ListaSimple()  # Lista de ListaSimple([hilera, posicion])
-    while not temp_acciones2.estaVacia():
-        accion = temp_acciones2.Pop()
-        acciones_plan.insertar(accion)
-
-    # Simulación de drones en el campo
-    eventos = Cola()
-    tiempo = 0
-    contador_accion = 0  # contador para acciones
-
-    # contador del total de acciones
-    total_acciones = 0
-    actual_accion = acciones_plan.primero
-    while actual_accion:
-        total_acciones += 1
         actual_accion = actual_accion.siguiente
 
-    while contador_accion < total_acciones:
-        tiempo += 1
-        # Obtener la acción actual (hilera, posicion)
-        actual_accion = acciones_plan.primero
-        contador = 0
-        while actual_accion and contador < contador_accion:
-            actual_accion = actual_accion.siguiente
-            contador += 1
-        if not actual_accion:
-            break
-        hilera_obj = actual_accion.info.primero.info
-        posicion_obj = actual_accion.info.primero.siguiente.info
+    # === SIMULACIÓN PRINCIPAL ===
+    eventos = Cola()
+    tiempo = 0
 
-        # Todos los drones se mueven 1 paso hacia su proxima posicion
+    # Contar total de acciones (posiciones a regar)
+    total_acciones = 0
+    nodo = acciones_plan.primero
+    while nodo:
+        total_acciones += 1
+        nodo = nodo.siguiente
+
+    acciones_completadas = 0
+
+    # Simular hasta que todas las acciones se completen
+    while acciones_completadas < total_acciones:
+        tiempo += 1
+
+        # 1. Mover todos los drones un paso hacia su próxima posición objetivo
         actual_estado = estados_drones.primero
         while actual_estado:
             estado = actual_estado.info
             if not estado.cola_posiciones.estaVacia():
-
                 # Ver la próxima posición sin sacarla
-                pos_temp = Cola()
-                proxima_pos = None
+                temp_cola = Cola()
+                prox_pos = None
                 while not estado.cola_posiciones.estaVacia():
                     item = estado.cola_posiciones.Pop()
-                    if proxima_pos is None:
-                        proxima_pos = item
-                    pos_temp.Push(item)
-                # Restaurar cola
-                while not pos_temp.estaVacia():
-                    estado.cola_posiciones.Push(pos_temp.Pop())
-                pos_temp = None
+                    if prox_pos is None:
+                        prox_pos = item
+                    temp_cola.Push(item)
+                # Restaurar la cola
+                while not temp_cola.estaVacia():
+                    estado.cola_posiciones.Push(temp_cola.Pop())
 
-                if proxima_pos is not None:
-                    if estado.posicion_actual < proxima_pos:
+                if prox_pos is not None:
+                    if estado.posicion_actual < prox_pos:
                         estado.posicion_actual += 1
                         eventos.Push(Evento(tiempo, estado.id_dron, f"Adelante (H{estado.hilera}P{estado.posicion_actual})"))
-                    elif estado.posicion_actual > proxima_pos:
+                    elif estado.posicion_actual > prox_pos:
                         estado.posicion_actual -= 1
                         eventos.Push(Evento(tiempo, estado.id_dron, f"Atrás (H{estado.hilera}P{estado.posicion_actual})"))
             actual_estado = actual_estado.siguiente
 
-        # Verifica si el dron de la acción actual puede regar
-        id_dron_obj = buscar_dron_por_hilera(mapeo_hilera_dron, hilera_obj)
-        if id_dron_obj is not None:
-            estado_obj = buscar_estado_dron(estados_drones, id_dron_obj)
-            if estado_obj and estado_obj.posicion_actual == posicion_obj:
-                # Verifica que la próxima posición en su cola 
-                if not estado_obj.cola_posiciones.estaVacia():
-                    primera_pos = estado_obj.cola_posiciones.Pop()  # Sacar la posición
-                    if primera_pos == posicion_obj:
-                        eventos.Push(Evento(tiempo, id_dron_obj, "Regar"))
-                        contador_accion += 1  # Avanzar en el plan
-                    else:
-                        # Volver a meter la posición 
-                        estado_obj.cola_posiciones.Push(primera_pos) # Si no se riega, los drones se siguen boviendo
+        # 2. Verificar si algún dron puede regar (está en la posición objetivo)
+        actual_estado = estados_drones.primero
+        while actual_estado:
+            estado = actual_estado.info
+            if not estado.cola_posiciones.estaVacia():
+                # Ver la próxima posición
+                temp_cola = Cola()
+                prox_pos = None
+                while not estado.cola_posiciones.estaVacia():
+                    item = estado.cola_posiciones.Pop()
+                    if prox_pos is None:
+                        prox_pos = item
+                    temp_cola.Push(item)
+                while not temp_cola.estaVacia():
+                    estado.cola_posiciones.Push(temp_cola.Pop())
+
+                if prox_pos is not None and estado.posicion_actual == prox_pos:
+                    # ¡Regar!
+                    estado.cola_posiciones.Pop()  # Eliminar la posición regada
+                    eventos.Push(Evento(tiempo, estado.id_dron, "Regar"))
+                    acciones_completadas += 1
+            actual_estado = actual_estado.siguiente
 
     # Eventos de finalización
     actual_estado = estados_drones.primero
@@ -211,7 +207,8 @@ def simular_recorrido(invernadero, plan):
 
     return eventos
 
-# funciones para la creacion de la tabla html
+
+# === FUNCIONES PARA LA TABLA HTML (sin cambios) ===
 
 def buscar_tiempo(tabla, tiempo):
     actual = tabla.primero
@@ -286,17 +283,17 @@ def generar_tabla_eventos(eventos):
             actual_fin = fin_drones.primero
             while actual_fin:
                 fin_info = actual_fin.info
-                if fin_info[0] == d and fin_info[1] < tiempo:  #si terminó ANTES
+                if fin_info[0] == d and fin_info[1] < tiempo:
                     ya_termino_antes = True
                     break
                 actual_fin = actual_fin.siguiente
 
             if ya_termino_antes:
-                html += "<td></td>"  # Celda vacía si ya terminó en un tiempo anterior
+                html += "<td></td>"
             elif accion == "":
                 html += "<td>Espera</td>"
             else:
-                html += f"<td>{accion}</td>"  # "FIN" en si ya termino
+                html += f"<td>{accion}</td>"
         html += "</tr>"
         actual_tiempo = actual_tiempo.siguiente
 

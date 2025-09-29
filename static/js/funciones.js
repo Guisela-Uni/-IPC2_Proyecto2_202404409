@@ -1,89 +1,61 @@
+// funciones.js
+// Archivo mínimo y no intrusivo para mantener el comportamiento por defecto (submit de formularios).
+// Si en futuro quieres la experiencia AJAX, podemos reactivar las funciones aquí.
+
+// Placeholder: no hace nada por defecto. Dejar el submit clásico en el HTML.
 function subirArchivo() {
-    const archivo = document.getElementById('fileXML').files[0];
-    console.log("Archivo seleccionado:", archivo); // Verifica que no sea undefined
-
-    if (!archivo) {
-        alert("Por favor selecciona un archivo XML.");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('archivo', archivo);
-
-    fetch('/procesar_xml', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log("Respuesta del servidor:", data); // verifica la respuesta del servidor
-        if (data.invernaderos) {
-                const contenedor = document.getElementById('listaInvernaderos');
-                const invernaderoSelect = document.getElementById('invernadero');
-                contenedor.innerHTML = '<h3>Invernaderos cargados:</h3>';
-                // Si existe un <select id="invernadero"> en la plantilla, lo rellenamos
-                if (invernaderoSelect) {
-                    invernaderoSelect.innerHTML = '';
-                    data.invernaderos.forEach(nombre => {
-                        const opt = document.createElement('option');
-                        opt.value = nombre;
-                        opt.textContent = nombre;
-                        invernaderoSelect.appendChild(opt);
-                    });
-                }
-                // Mostrar botones para selección si el contenedor existe
-                data.invernaderos.forEach(nombre => {
-                    const btn = document.createElement('button');
-                    btn.textContent = nombre;
-                    btn.onclick = () => seleccionarInvernadero(nombre);
-                    contenedor.appendChild(btn);
-                });
-        } else {
-            alert(data.error);
-        }
-    })
-    .catch(error => {
-        console.error("Error en fetch:", error);
-    });
+    console.warn('Uso actual: utilice el botón de submit del formulario para subir el archivo.');
 }
 
 function seleccionarInvernadero(nombre) {
-    fetch('/seleccionar_invernadero', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({nombre})
-    })
-    .then(res => res.json())
-    .then(data => {
-        const el = document.getElementById('mensajeSeleccion') || document.getElementById('mensaje1Seleccion');
-        if (el) el.textContent = data.mensaje;
-    });
+    // Intencionalmente vacío: la aplicación usa submit para procesar la selección.
+    console.log('Seleccionar invernadero (noop):', nombre);
 }
 
+// No hay listeners automáticos para no interferir con los submits del formulario.
 document.addEventListener('DOMContentLoaded', function () {
-  const invernaderoSelect = document.getElementById('invernadero');
-  const riegoSelect = document.getElementById('riego');
+    const invernaderoSelect = document.getElementById('invernadero');
+    const riegoSelect = document.getElementById('riego');
+    if (!invernaderoSelect || !riegoSelect) return;
 
-  invernaderoSelect.addEventListener('change', function () {
-    const nombre = invernaderoSelect.value;
-    // Enviar también el nombre del archivo subido para que el servidor pueda cargarlo
-    const filename = window.uploadedFilename || document.getElementById('fileXML')?.files?.[0]?.name;
-    fetch('/obtener_planes', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ invernadero: nombre, filename: filename })
-    })
-    .then(response => response.json())
-    .then(data => {
-        riegoSelect.innerHTML = '';
-        (data.planes || []).forEach(plan => {
-            const option = document.createElement('option');
-            option.value = plan;
-            option.textContent = plan;
-            riegoSelect.appendChild(option);
-        });
+    async function actualizarPlanes(nombre) {
+        const filenameInput = document.querySelector('input[name="archivo_nombre"]');
+        const filename = (filenameInput && filenameInput.value) || window.uploadedFilename || null;
+        if (!filename) {
+            console.warn('No se encontró filename en el DOM para solicitar planes.');
+            return;
+        }
+
+        try {
+            const res = await fetch('/obtener_planes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ invernadero: nombre, filename: filename })
+            });
+            if (!res.ok) {
+                console.error('Error al solicitar planes:', res.status);
+                return;
+            }
+            const data = await res.json();
+            riegoSelect.innerHTML = '';
+            (data.planes || []).forEach(plan => {
+                const option = document.createElement('option');
+                option.value = plan;
+                option.textContent = plan;
+                riegoSelect.appendChild(option);
+            });
+        } catch (err) {
+            console.error('Error en fetch obtener_planes:', err);
+        }
+    }
+
+    invernaderoSelect.addEventListener('change', function () {
+        const nombre = invernaderoSelect.value;
+        if (nombre) actualizarPlanes(nombre);
     });
-    });
+
+    // Al cargar la página, actualizar planes según la opción seleccionada actualmente
+    if (invernaderoSelect.value) {
+        actualizarPlanes(invernaderoSelect.value);
+    }
 });

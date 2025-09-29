@@ -3,7 +3,9 @@ from lectorXML import carga
 from sistema_optimizacion import SistemaOptimizacion
 from simulacion_drones import simular_recorrido, generar_tabla_eventos
 from grafico import generar_dot_estados, generar_imagen_dot
-from reporte_html import ReporteHTML
+from reporte_html import  Archivo_Salida, ReporteHTML
+from werkzeug.utils import secure_filename
+import uuid 
 import os
 
 app = Flask(__name__)
@@ -242,34 +244,148 @@ def descargar_grafico():
                                 error=True)
 
 
-#funcion para generar el reporte hmtl
 @app.route('/generar_reporte_html', methods=['POST'])
 def generar_reporte_html():
-    filename = request.form.get('archivo_nombre')
+    filename = request.form.get('archivo_nombre') 
     if not filename:
         return render_template('index.html',
                                 titulo="Error",
                                 descripcion="No se cargó ningún archivo XML.",
                                 error=True)
 
+    filename = secure_filename(filename)  
     ruta = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if not os.path.exists(ruta):  
+        return render_template('index.html',
+                                titulo="Error",
+                                descripcion="El archivo XML no se encontró.",
+                                error=True)
+
+    try:
+        cargador = carga()
+        cargador.cargar_archivo(ruta)
+
+        generador = ReporteHTML()
+        ruta_salida = os.path.join(app.config['UPLOAD_FOLDER'], "reportes_invernaderos.html")
+        generador.generar_reporte(cargador, ruta_salida)
+
+        return send_file(
+            ruta_salida,
+            as_attachment=True,
+            download_name="reportes_invernaderos.html",
+            mimetype='text/html'
+        )
+    except Exception as e:
+        print(f"Error al generar HTML: {e}")
+        return render_template('index.html',
+                                titulo="Error",
+                                descripcion="Error al generar el reporte HTML.",
+                                error=True)
+
+
+# Endpoint AJAX: recibir archivo via fetch (FormData) y devolver invernaderos en JSON
+@app.route('/procesar_xml', methods=['POST'])
+def procesar_xml():
+    archivo = request.files.get('archivo')
+    if not archivo or not archivo.filename.endswith('.xml'):
+        return jsonify({'error': 'Archivo inválido'}), 400
+
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    ruta = os.path.join(app.config['UPLOAD_FOLDER'], archivo.filename)
+    archivo.save(ruta)
+
     cargador = carga()
     cargador.cargar_archivo(ruta)
 
-    # Generar reporte HTML
-    from reporte_html import ReporteHTML
-    generador = ReporteHTML()
-    ruta_salida = os.path.join(app.config['UPLOAD_FOLDER'], "reportes_invernaderos.html")
-    generador.generar_reporte(cargador, ruta_salida)
+    invernaderos = []
+    actual = cargador.invernaderos.primero
+    while actual:
+        invernaderos.append(actual.info.nombre)
+        actual = actual.siguiente
 
-    # Descargar con nombre correcto y tipo MIME
-    return send_file(
-        ruta_salida,
-        as_attachment=True,
-        download_name="reportes_invernaderos.html",
-        mimetype='text/html'
-    )
+    return jsonify({'invernaderos': invernaderos, 'filename': archivo.filename})
 
+
+# Endpoint AJAX: dado invernadero y filename (JSON), devolver planes disponibles
+@app.route('/obtener_planes', methods=['POST'])
+def obtener_planes():
+    data = request.get_json() or {}
+    invernadero_nombre = data.get('invernadero')
+    filename = data.get('filename')
+    if not filename:
+        return jsonify({'error': 'No se proporcionó filename'}), 400
+
+    ruta = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
+    if not os.path.exists(ruta):
+        return jsonify({'error': 'Archivo no encontrado'}), 404
+
+    cargador = carga()
+    cargador.cargar_archivo(ruta)
+
+    invernadero = cargador.buscar_invernadero(invernadero_nombre)
+    if not invernadero:
+        return jsonify({'error': 'Invernadero no encontrado'}), 404
+
+    planes = []
+    nodo_plan = invernadero.planes.primero
+    while nodo_plan:
+        planes.append(nodo_plan.info.nombre)
+        nodo_plan = nodo_plan.siguiente
+
+    return jsonify({'planes': planes})
+
+
+# Endpoint AJAX simple: seleccionar invernadero -> devuelve mensaje
+@app.route('/seleccionar_invernadero', methods=['POST'])
+def seleccionar_invernadero():
+    data = request.get_json() or {}
+    nombre = data.get('nombre')
+    if not nombre:
+        return jsonify({'mensaje': 'No se recibió nombre'}), 400
+    return jsonify({'mensaje': f'Invernadero "{nombre}" seleccionado'})
+
+
+@app.route('/generar_salida_xml', methods=['POST'])
+def generar_salida_xml():
+    filename = request.form.get('archivo_nombre')  
+    if not filename:
+        return render_template('index.html',
+                                titulo="Error",
+                                descripcion="No se cargó ningún archivo XML.",
+                                error=True)
+
+    filename = secure_filename(filename)
+    ruta = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+    if not os.path.exists(ruta):
+        return render_template('index.html',
+                                titulo="Error",
+                                descripcion="El archivo XML no se encontró.",
+                                error=True)
+
+    try:
+        cargador = carga()
+        cargador.cargar_archivo(ruta)
+
+        salida = Archivo_Salida()  
+        xml_nombre = f"salida_{uuid.uuid4().hex}.xml"
+        ruta_xml = os.path.join(app.config['UPLOAD_FOLDER'], xml_nombre)
+        salida.generar_salida(cargador, ruta_xml)
+
+        return send_file(
+            ruta_xml,
+            as_attachment=True,
+            download_name="salida_invernaderos.xml",
+            mimetype='application/xml'
+        )
+
+    except Exception as e:
+        print(f"Error al generar XML: {e}")
+        return render_template('index.html',
+                                titulo="Error",
+                                descripcion="Error al generar el archivo XML.",
+                                error=True)
 
     
 #pone el debug en "on" para actualizar pagina    

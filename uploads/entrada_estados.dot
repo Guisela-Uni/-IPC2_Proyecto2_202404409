@@ -4,14 +4,17 @@ digraph EstadosDrones {
   fontsize=20;
   node [shape=box, style=filled, color=lightcyan];
   rankdir=LR;
-  "t=1" [label="t=1\nDR04: Adelante (H4P1)\nDR03: Adelante (H3P1)\nDR02: Adelante (H2P1)\nDR01: Adelante (H1P1)"];
-  "t=2" [label="t=2\nDR04: Espera\nDR03: Adelante (H3P2)\nDR02: Adelante (H2P2)\nDR01: Adelante (H1P2)"];
-  "t=3" [label="t=3\nDR04: Espera\nDR03: Espera\nDR02: Adelante (H2P3)\nDR01: Adelante (H1P3)"];
-  "t=4" [label="t=4\nDR04: Espera\nDR03: Espera\nDR02: Espera\nDR01: Regar"];
-  "t=5" [label="t=5\nDR04: FIN\nDR03: Espera\nDR02: Espera\nDR01: Espera"];
-  "t=6" [label="t=6\nDR03: FIN\nDR02: Espera\nDR01: Espera"];
-  "t=7" [label="t=7\nDR02: FIN\nDR01: Espera"];
-  "t=8" [label="t=8\nDR01: FIN"];
+  "t=1" [label="t=1\nDR01: Adelante (H1P1)\nDR04: Adelante (H4P1)\nDR02: Adelante (H2P1)\nDR03: Adelante (H3P1)"];
+  "t=2" [label="t=2\nDR01: Adelante (H1P2)\nDR04: Adelante (H4P2)\nDR02: Adelante (H2P2)\nDR03: Adelante (H3P2)"];
+  "t=3" [label="t=3\nDR01: Espera\nDR04: Regar\nDR02: Adelante (H2P3)\nDR03: Adelante (H3P3)"];
+  "t=4" [label="t=4\nDR01: Espera\nDR04: Espera\nDR02: Regar\nDR03: Espera"];
+  "t=5" [label="t=5\nDR01: Espera\nDR04: Espera\nDR02: Atrás (H2P2)\nDR03: Regar"];
+  "t=6" [label="t=6\nDR01: Espera\nDR04: Espera\nDR02: Atrás (H2P1)\nDR03: Atrás (H3P2)"];
+  "t=7" [label="t=7\nDR01: Espera\nDR04: Espera\nDR02: Espera\nDR03: Atrás (H3P1)"];
+  "t=8" [label="t=8\nDR01: FIN\nDR04: Espera\nDR02: Espera\nDR03: Espera"];
+  "t=9" [label="t=9\nDR04: FIN\nDR02: Espera\nDR03: Espera"];
+  "t=10" [label="t=10\nDR02: FIN\nDR03: Espera"];
+  "t=11" [label="t=11\nDR03: FIN"];
   "t=1" -> "t=2";
   "t=2" -> "t=3";
   "t=3" -> "t=4";
@@ -19,4 +22,7 @@ digraph EstadosDrones {
   "t=5" -> "t=6";
   "t=6" -> "t=7";
   "t=7" -> "t=8";
+  "t=8" -> "t=9";
+  "t=9" -> "t=10";
+  "t=10" -> "t=11";
 }
