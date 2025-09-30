@@ -1,18 +1,12 @@
-// funciones.js
-// Archivo mínimo y no intrusivo para mantener el comportamiento por defecto (submit de formularios).
-// Si en futuro quieres la experiencia AJAX, podemos reactivar las funciones aquí.
-
-// Placeholder: no hace nada por defecto. Dejar el submit clásico en el HTML.
+//aqui sube el archivo xml
 function subirArchivo() {
     console.warn('Uso actual: utilice el botón de submit del formulario para subir el archivo.');
 }
-
+//selecciona el invernadero
 function seleccionarInvernadero(nombre) {
-    // Intencionalmente vacío: la aplicación usa submit para procesar la selección.
     console.log('Seleccionar invernadero (noop):', nombre);
 }
 
-// No hay listeners automáticos para no interferir con los submits del formulario.
 document.addEventListener('DOMContentLoaded', function () {
     const invernaderoSelect = document.getElementById('invernadero');
     const riegoSelect = document.getElementById('riego');
@@ -54,7 +48,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (nombre) actualizarPlanes(nombre);
     });
 
-    // Al cargar la página, actualizar planes según la opción seleccionada actualmente
     if (invernaderoSelect.value) {
         actualizarPlanes(invernaderoSelect.value);
     }
